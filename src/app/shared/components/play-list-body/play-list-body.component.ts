@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import * as dataRaw from '../../../data/tracks.json';
+import { Component, OnInit, Input } from '@angular/core';
 import { TrackModel } from '@core/models/tacks.model';
 
 @Component({
@@ -7,18 +6,15 @@ import { TrackModel } from '@core/models/tacks.model';
   templateUrl: './play-list-body.component.html',
   styleUrls: ['./play-list-body.component.css'],
 })
-export class PlayListBodyComponent {
-  tracks: TrackModel[] = [];
+export class PlayListBodyComponent implements OnInit {
+  @Input() tracks: TrackModel[] = [];
   optionSort: { property: string | null; order: string } = {
     property: null,
     order: 'asc',
   };
 
   constructor() {}
-  ngOnInit(): void {
-    const { data }: any = (dataRaw as any).default;
-    this.tracks = data;
-  }
+  ngOnInit(): void {}
 
   changeSort(property: string): void {
     const { order } = this.optionSort;
@@ -28,4 +24,7 @@ export class PlayListBodyComponent {
     };
     console.log(this.optionSort);
   }
+}
+function Imput(target: PlayListBodyComponent, propertyKey: 'tracks'): void {
+  throw new Error('Function not implemented.');
 }

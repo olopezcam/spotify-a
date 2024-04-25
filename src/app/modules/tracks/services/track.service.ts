@@ -1,30 +1,45 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TrackModel } from '@core/models/tacks.model';
-import { Observable, of } from 'rxjs';
-import * as dataRaw from '../../../data/tracks.json';
+import { Observable, catchError, map, mergeMap, of } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TrackService {
-  dataTracksTrending$: Observable<TrackModel[]> = of([]);
-  dataTracksRandom$: Observable<TrackModel[]> = of([]);
+  private readonly URL = environment.api;
 
-  constructor() {
-    const { data } = (dataRaw as any).default;
-    this.dataTracksTrending$ = of(data);
+  constructor(private httpClient: HttpClient) {}
 
-    this.dataTracksRandom$ = new Observable((observer) => {
-      const trackExample: TrackModel = {
-        _id: 9,
-        name: 'Track 9',
-        album: 'Album 9',
-        url: 'https://www.youtube.com/watch?v=9',
-        cover: 'https://picsum.photos/200/200',
-      };
-      setTimeout(() => {
-        observer.next([trackExample]);
-      }, 3500);
+  private skipById(
+    listTracks: TrackModel[],
+    id: number
+  ): Promise<TrackModel[]> {
+    return new Promise((resolve, reject) => {
+      const listTmp = listTracks.filter(
+        (track: TrackModel) => track._id !== id
+      );
+      resolve(listTmp);
     });
+  }
+
+  getAllTracks$(): Observable<any> {
+    return this.httpClient.get(`${this.URL}/tracks`).pipe(
+      map(({ data }: any) => {
+        return data;
+      })
+    );
+  }
+
+  getAllRandom$(): Observable<any> {
+    return this.httpClient.get(`${this.URL}/tracks`).pipe(
+      mergeMap(({ data }: any) => this.skipById(data, 2)),
+      catchError((error) => {
+        const { status, statusText } = error;
+        console.log('Algo ha ocurrido', status, statusText);
+        return of([]);
+      })
+    );
   }
 }

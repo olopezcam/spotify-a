@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '@modules/auth/services/auth.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login-page',
@@ -8,9 +10,14 @@ import { AuthService } from '@modules/auth/services/auth.service';
   styleUrls: ['./login-page.component.css'],
 })
 export class LoginPageComponent implements OnInit {
+  errorSession: boolean = false;
   formLogin: FormGroup = new FormGroup({});
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private cookie: CookieService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.formLogin = new FormGroup({
@@ -25,6 +32,17 @@ export class LoginPageComponent implements OnInit {
 
   sendLogin(): void {
     const { email, password } = this.formLogin.value;
-    this.authService.sendCredentials(email, password);
+    this.authService.sendCredentials(email, password).subscribe(
+      (response) => {
+        console.log('Login correcto', response);
+        const { tokenSession, data } = response;
+        this.cookie.set('token', tokenSession, 4, '/');
+        this.router.navigate(['/', 'tracks']);
+      },
+      (err) => {
+        this.errorSession = true;
+        console.log('Login fail', err);
+      }
+    );
   }
 }

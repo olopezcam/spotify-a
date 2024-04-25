@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import * as dataRaw from '../../../../data/tracks.json';
 import { TrackModel } from '@core/models/tacks.model';
 import { TrackService } from '@modules/tracks/services/track.service';
 import { Subscription } from 'rxjs';
@@ -10,7 +9,6 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./tracks-page.component.css'],
 })
 export class TracksPageComponent implements OnInit {
-  // mockTrackList: Array<TrackModel> = [];
   tracksTrending: Array<TrackModel> = [];
   tracksRandom: Array<TrackModel> = [];
 
@@ -19,26 +17,33 @@ export class TracksPageComponent implements OnInit {
   constructor(private trackService: TrackService) {}
 
   ngOnInit(): void {
-    // const { data }: any = (dataRaw as any).default;
-    // this.mockTrackList = data;
-    const obserer1$ = this.trackService.dataTracksTrending$.subscribe(
-      (response) => {
-        this.tracksTrending = response;
-      }
-    );
-
-    const obserer2$ = this.trackService.dataTracksRandom$.subscribe(
-      (response) => {
-        this.tracksRandom = [...this.tracksRandom, ...response];
-      }
-    );
-
-    this.listObservers$.push(obserer1$, obserer2$);
+    this.loadDataAll();
+    this.loadDataRandom();
   }
 
-  ngOnDestroy(): void {
-    this.listObservers$.forEach((observer) => {
-      observer.unsubscribe();
+  async loadDataAll(): Promise<any> {
+    this.tracksTrending = await this.trackService.getAllTracks$().toPromise();
+    // this.tracksRandom = await this.trackService.getAllTracks$().toPromise();
+    // this.trackService.getAllTracks$().subscribe((tracks: TrackModel[]) => {
+    //   this.tracksTrending = tracks;
+    // });
+    // const dataRaw = await this.trackService
+    //   .getAllTracks$()
+    //   .toPromise()
+    //   .then((res: TrackModel[]) => {
+    //     this.tracksTrending = res;
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+  }
+
+  loadDataRandom(): void {
+    this.trackService.getAllRandom$().subscribe((tracks: TrackModel[]) => {
+      console.log(tracks);
+      this.tracksRandom = tracks;
     });
   }
+
+  ngOnDestroy(): void {}
 }
