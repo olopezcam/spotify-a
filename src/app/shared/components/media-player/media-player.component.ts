@@ -1,5 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { TrackModel } from '@core/models/tacks.model';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { MultimediaService } from '@shared/services/multimedia.service';
 import { Subscription } from 'rxjs';
 
@@ -9,25 +14,24 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./media-player.component.css'],
 })
 export class MediaPlayerComponent implements OnInit, OnDestroy {
-  mockCover: TrackModel = {
-    cover: 'https://i.scdn.co/image/ab67616d0000b27345ca41b0d2352242c7c9d4bc',
-    album: 'Gioli & Assia',
-    name: 'BEBE (Oficial)',
-    url: 'https://open.spotify.com/',
-    _id: 1,
-  };
-
+  @ViewChild('progressBar') progressBar: ElementRef = new ElementRef('');
   listObservers$: Array<Subscription> = [];
-
-  constructor(private multimediaPlayer: MultimediaService) {}
+  state: string = 'paused';
+  constructor(public multimediaService: MultimediaService) {}
 
   ngOnInit(): void {
-    const oberver1$: Subscription = this.multimediaPlayer.callback.subscribe(
-      (response: TrackModel) => {
-        console.log('Track playing: ', response);
-      }
+    const observer1$ = this.multimediaService.playerStatus$.subscribe(
+      (status) => (this.state = status)
     );
-    this.listObservers$.push(oberver1$);
+    this.listObservers$ = [observer1$];
+  }
+
+  handlePosition(event: MouseEvent): void {
+    const progressBar = this.progressBar.nativeElement as HTMLDivElement;
+    const width = progressBar.clientWidth;
+    const clickX = event.offsetX;
+    const duration = this.multimediaService.audio.duration;
+    this.multimediaService.audio.currentTime = (clickX / width) * duration;
   }
 
   ngOnDestroy(): void {
