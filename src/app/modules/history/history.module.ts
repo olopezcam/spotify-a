@@ -4,17 +4,16 @@ import { CommonModule } from '@angular/common';
 import { HistoryRoutingModule } from './history-routing.module';
 import { HistoryPageComponent } from './pages/history-page/history-page.component';
 import { SearchComponent } from './components/search/search.component';
-import { SharedModule } from '../../shared/shared.module';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [HistoryPageComponent, SearchComponent],
-  imports: [
+    imports: [
     CommonModule,
     HistoryRoutingModule,
-    SharedModule,
     FormsModule,
     ReactiveFormsModule,
-  ],
+    HistoryPageComponent, SearchComponent,
+],
 })
 export class HistoryModule {}

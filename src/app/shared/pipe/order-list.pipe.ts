@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { TrackModel } from '@core/models/tacks.model';
 
 @Pipe({
-  name: 'orderList',
+    name: 'orderList',
+    standalone: true,
 })
 export class OrderListPipe implements PipeTransform {
   transform(

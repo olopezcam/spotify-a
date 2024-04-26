@@ -9,8 +9,8 @@ describe('PlayListBodyComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [PlayListBodyComponent, OrderListPipe],
-    }).compileComponents();
+    imports: [PlayListBodyComponent, OrderListPipe],
+}).compileComponents();
 
     fixture = TestBed.createComponent(PlayListBodyComponent);
     component = fixture.componentInstance;

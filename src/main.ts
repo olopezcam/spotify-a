@@ -1,7 +1,27 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-import { AppModule } from './app/app.module';
+import { importProvidersFrom } from '@angular/core';
+import { AppComponent } from './app/app.component';
+import { HomeModule } from '@modules/home/home.module';
+import { AppRoutingModule } from './app/app-routing.module';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { InjectSessionInterceptor } from '@core/interceptors/inject-session.interceptor';
+import {
+  HTTP_INTERCEPTORS,
+  withInterceptorsFromDi,
+  provideHttpClient,
+} from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
 
-
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(BrowserModule, AppRoutingModule),
+    CookieService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: InjectSessionInterceptor,
+      multi: true,
+    },
+    provideHttpClient(withInterceptorsFromDi()),
+  ],
+}).catch((err) => console.error(err));

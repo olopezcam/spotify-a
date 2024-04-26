@@ -10,9 +10,8 @@ describe('LoginPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule],
-      declarations: [LoginPageComponent],
-    }).compileComponents();
+    imports: [HttpClientTestingModule, RouterTestingModule, LoginPageComponent],
+}).compileComponents();
 
     fixture = TestBed.createComponent(LoginPageComponent);
     component = fixture.componentInstance;
