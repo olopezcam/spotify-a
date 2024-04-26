@@ -7,7 +7,7 @@
       [ngClass]="{ 'card-small': mode === 'small', 'card-big': mode === 'big' }"
     >
       <li *ngFor="let track of dataTracks">
-        <app-card-player [mode]="mode" [track]="track"></app-card-player>
+        <app-card-player [mode]="mode" [track]="track" />
       </li>
     </ul>
   </div>
