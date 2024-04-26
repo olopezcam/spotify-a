@@ -28,9 +28,12 @@ import { ImgBrokenDirective } from './directives/img-broken.directive';
     SideBarComponent,
     HeaderUserComponent,
     MediaPlayerComponent,
+    CardPlayerComponent,
     SectionGenericComponent,
     PlayListHeaderComponent,
     PlayListBodyComponent,
+    OrderListPipe,
+    ImgBrokenDirective,
   ],
 })
 export class SharedModule {}

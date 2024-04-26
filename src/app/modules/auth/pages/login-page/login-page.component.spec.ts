@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LoginPageComponent } from './login-page.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('LoginPageComponent', () => {
   let component: LoginPageComponent;
@@ -8,16 +10,26 @@ describe('LoginPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LoginPageComponent ]
-    })
-    .compileComponents();
+      imports: [HttpClientTestingModule, RouterTestingModule],
+      declarations: [LoginPageComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LoginPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('Deberia retornar invalido el formulario', () => {
+    const mockCredentials = {
+      email: 'test000vc000',
+      password: '1231111111111111111111',
+    };
+    const emailForm = component.formLogin.get('email');
+    const passwordForm = component.formLogin.get('password');
+
+    emailForm?.setValue(mockCredentials.email);
+    passwordForm?.setValue(mockCredentials.password);
+
+    expect(component.formLogin.invalid).toEqual(false);
   });
 });
