@@ -1,37 +1,33 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
   ViewChild,
   ElementRef,
+  inject,
 } from '@angular/core';
 import { MultimediaService } from '@shared/services/multimedia.service';
-import { Subscription } from 'rxjs';
 import { NgTemplateOutlet, NgIf, NgClass, AsyncPipe } from '@angular/common';
+import { destroyCustom } from '@core/utils/destoyCustom';
 
 @Component({
-    selector: 'app-media-player',
-    templateUrl: './media-player.component.html',
-    styleUrls: ['./media-player.component.css'],
-    standalone: true,
-    imports: [
-        NgTemplateOutlet,
-        NgIf,
-        NgClass,
-        AsyncPipe,
-    ],
+  selector: 'app-media-player',
+  templateUrl: './media-player.component.html',
+  styleUrls: ['./media-player.component.css'],
+  standalone: true,
+  imports: [NgTemplateOutlet, NgIf, NgClass, AsyncPipe],
 })
-export class MediaPlayerComponent implements OnInit, OnDestroy {
+export class MediaPlayerComponent implements OnInit {
   @ViewChild('progressBar') progressBar: ElementRef = new ElementRef('');
-  listObservers$: Array<Subscription> = [];
   state: string = 'paused';
-  constructor(public multimediaService: MultimediaService) {}
+  multimediaService = inject(MultimediaService);
+  destroyCustom = destroyCustom();
 
   ngOnInit(): void {
-    const observer1$ = this.multimediaService.playerStatus$.subscribe(
-      (status) => (this.state = status)
-    );
-    this.listObservers$ = [observer1$];
+    this.multimediaService.playerStatus$
+      .pipe(this.destroyCustom())
+      .subscribe((status) => {
+        this.state = status as string;
+      });
   }
 
   handlePosition(event: MouseEvent): void {
@@ -40,9 +36,5 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
     const clickX = event.offsetX;
     const duration = this.multimediaService.audio.duration;
     this.multimediaService.audio.currentTime = (clickX / width) * duration;
-  }
-
-  ngOnDestroy(): void {
-    this.listObservers$.forEach((observer) => observer.unsubscribe());
   }
 }

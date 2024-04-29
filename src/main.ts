@@ -6,21 +6,18 @@ import {
   HTTP_INTERCEPTORS,
   withInterceptorsFromDi,
   provideHttpClient,
+  withInterceptors,
 } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { appRoutes } from './app/app.routes';
+import { authorizationInterceptor } from '@core/interceptors/session.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(appRoutes),
+    provideRouter(appRoutes, withComponentInputBinding()),
     importProvidersFrom(BrowserModule),
     CookieService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: InjectSessionInterceptor,
-      multi: true,
-    },
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptors([authorizationInterceptor])),
   ],
 }).catch((err) => console.error(err));

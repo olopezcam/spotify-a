@@ -5,19 +5,15 @@ import { ImgBrokenDirective } from '../../directives/img-broken.directive';
 import { NgIf, NgClass } from '@angular/common';
 
 @Component({
-    selector: 'app-card-player',
-    templateUrl: './card-player.component.html',
-    styleUrls: ['./card-player.component.css'],
-    standalone: true,
-    imports: [
-        NgIf,
-        NgClass,
-        ImgBrokenDirective,
-    ],
+  selector: 'app-card-player',
+  templateUrl: './card-player.component.html',
+  styleUrls: ['./card-player.component.css'],
+  standalone: true,
+  imports: [NgIf, NgClass, ImgBrokenDirective],
 })
 export class CardPlayerComponent {
-  @Input() mode: 'small' | 'big' = 'small';
-  @Input() track: TrackModel = {
+  @Input({ required: true }) mode: 'small' | 'big' = 'small';
+  @Input({ required: true, alias: 'trackObject' }) track: TrackModel = {
     _id: 0,
     name: '',
     album: '',
