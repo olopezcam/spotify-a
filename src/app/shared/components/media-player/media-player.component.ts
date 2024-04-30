@@ -4,6 +4,7 @@ import {
   ViewChild,
   ElementRef,
   inject,
+  effect,
 } from '@angular/core';
 import { MultimediaService } from '@shared/services/multimedia.service';
 import { NgTemplateOutlet, NgIf, NgClass, AsyncPipe } from '@angular/common';
@@ -16,18 +17,17 @@ import { destroyCustom } from '@core/utils/destoyCustom';
   standalone: true,
   imports: [NgTemplateOutlet, NgIf, NgClass, AsyncPipe],
 })
-export class MediaPlayerComponent implements OnInit {
+export class MediaPlayerComponent {
   @ViewChild('progressBar') progressBar: ElementRef = new ElementRef('');
   state: string = 'paused';
   multimediaService = inject(MultimediaService);
   destroyCustom = destroyCustom();
 
-  ngOnInit(): void {
-    this.multimediaService.playerStatus$
-      .pipe(this.destroyCustom())
-      .subscribe((status) => {
-        this.state = status as string;
-      });
+  constructor() {
+    effect(() => {
+      const state = this.multimediaService.playerStatusSignal();
+      this.state = state;
+    });
   }
 
   handlePosition(event: MouseEvent): void {

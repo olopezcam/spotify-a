@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { TrackModel } from '@core/models/tacks.model';
 import { MultimediaService } from '@shared/services/multimedia.service';
 import { ImgBrokenDirective } from '../../directives/img-broken.directive';
@@ -21,11 +21,10 @@ export class CardPlayerComponent {
     cover: '',
   };
 
-  constructor(private multimediaService: MultimediaService) {}
-
-  ngOnInit(): void {}
+  multimediaService = inject(MultimediaService);
 
   sendPlay(track: TrackModel): void {
-    this.multimediaService.trackInfo$.next(track);
+    // this.multimediaService.trackInfo$.next(track);
+    this.multimediaService.trackInfoSignal.set(track);
   }
 }

@@ -1,31 +1,32 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, effect, signal } from '@angular/core';
 import { TrackModel } from '@core/models/tacks.model';
-import { BehaviorSubject, Observable, Observer, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MultimediaService {
   callback: EventEmitter<any> = new EventEmitter<any>();
-
-  public trackInfo$: BehaviorSubject<any> = new BehaviorSubject(undefined);
   public audio!: HTMLAudioElement;
-  public timeElapsed$: BehaviorSubject<string> = new BehaviorSubject<string>(
-    '00:00'
-  );
-  public timeRemaining$: BehaviorSubject<string> = new BehaviorSubject<string>(
-    '-00:00'
-  );
-  public playerStatus$: BehaviorSubject<string> = new BehaviorSubject('paused');
-  public playerPercentage$: BehaviorSubject<number> = new BehaviorSubject(0);
+
+  public trackInfoSignal = signal<TrackModel | undefined>(undefined);
+
+  public timeElapsedSignal = signal<string>('00:00');
+
+  public timeRemainingSignal = signal<string>('-00:00');
+
+  public playerStatusSignal = signal<string>('paused');
+
+  public playerPercentageSignal = signal<number>(0);
 
   constructor() {
     this.audio = new Audio();
-    this.trackInfo$.subscribe((responseOk) => {
-      if (responseOk) {
-        this.setAudio(responseOk);
+    effect(() => {
+      const dataInfo = this.trackInfoSignal();
+      if (dataInfo) {
+        this.setAudio(dataInfo);
       }
     });
+
     this.listenAllEvents();
   }
 
@@ -39,22 +40,22 @@ export class MultimediaService {
 
   private setPercentage(currentTime: number, duration: number): void {
     let percentage = (currentTime * 100) / duration;
-    this.playerPercentage$.next(percentage);
+    this.playerPercentageSignal.set(percentage);
   }
 
   private setPlayerStatus = (state: any) => {
     switch (state.type) {
       case 'play':
-        this.playerStatus$.next('play');
+        this.playerStatusSignal.set('play');
         break;
       case 'playing':
-        this.playerStatus$.next('playing');
+        this.playerStatusSignal.set('playing');
         break;
       case 'ended':
-        this.playerStatus$.next('ended');
+        this.playerStatusSignal.set('ended');
         break;
       default:
-        this.playerStatus$.next('paused');
+        this.playerStatusSignal.set('paused');
         break;
     }
   };
@@ -75,7 +76,7 @@ export class MultimediaService {
     const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
     const displayFormat = `${displayMinutes}:${displaySeconds}`;
-    this.timeElapsed$.next(displayFormat);
+    this.timeElapsedSignal.set(displayFormat);
   }
 
   private setRemaining(currentTime: number, duration: number): void {
@@ -87,7 +88,7 @@ export class MultimediaService {
     const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
     const displayFormat = `-${displayMinutes}:${displaySeconds}`;
-    this.timeRemaining$.next(displayFormat);
+    this.timeRemainingSignal.set(displayFormat);
   }
 
   public setAudio(track: TrackModel): void {

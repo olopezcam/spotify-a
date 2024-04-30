@@ -27,6 +27,7 @@ export const skipById = (
 };
 
 export const getAllRandom$ = (): Observable<any> => {
+  const URL = environment.api;
   return inject(HttpClient)
     .get(`${URL}/tracks`)
     .pipe(
